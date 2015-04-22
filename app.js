@@ -5,20 +5,24 @@ var path = require('path');
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);
-var io = require('socket.io')(server, {
-    path: '/socket.io-client'
-});
-io.set('transports', ['websocket']);
+var io = require('socket.io')(server);
 
 server.listen(port, host);
 
 app.use(express.static(path.normalize(__dirname) + '/public'));
 
 io.on('connection', function (socket) {
-    socket.emit('news', {
-        hello: 'world'
-    });
+    var timerId = setInterval(function () {
+        socket.emit('news', {
+            hello: 'world'
+        });
+    }, 1000);
+
     socket.on('my other event', function (data) {
         console.log(data);
+    });
+
+    socket.on('disconnect', function () {
+        clearInterval(timerId);
     });
 });
