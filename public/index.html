@@ -13,17 +13,18 @@
 
 <body ng-controller="QuController as qu">
 
-    <div class="container top-spacing" ng-hide="queueId != null">
+    <div class="container top-spacing" ng-hide="registered">
         <div class="row">
             <form class="text-center">
-                <button type="button" class="btn btn-primary btn-lg" aria-label="Left Align" ng-click="connect()">
+                <button ng-disabled="!connected" type="button" class="btn btn-primary btn-lg" aria-label="Left Align" ng-click="connect()">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> open new queue
                 </button>
             </form>
+            <h3 class="text-center" ng-hide="connected">no connection with server</h3>
         </div>
     </div>
 
-    <div class="container top-spacing-small" ng-show="queueId != null">
+    <div class="container top-spacing-small" ng-show="registered">
         <div class="row">
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
@@ -40,12 +41,8 @@
                 </div>
             </nav>
 
-
-            <div class="col-lg-8">
-                <form class="text-right">
-
-                </form>
-            </div>
+            <h3 class="text-center" ng-hide="registered || !connected">registering...</h3>
+            <h3 class="text-center" ng-hide="connected">no connection with server</h3>
         </div>
         <div class="row">
             <table class="table table-hover" ng-show="clients.length > 0">
@@ -55,7 +52,8 @@
                 </thead>
                 <tbody ng-repeat="client in clients">
                     <tr>
-                        <td><h4>{{client.name}}</h4>
+                        <td>
+                            <h4>{{client.name}}</h4>
                         </td>
                         <td>
                             <button type="button" class="btn btn-default" aria-label="Left Align" ng-click="deleteClient(client)" title="remove client">

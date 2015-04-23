@@ -13,36 +13,38 @@
 </head>
 
 <body ng-controller="QuClController as qu">
-
-    <div class="container top-spacing" ng-show="!connected">
+    <div class="container top-spacing" ng-show="homeScreen">
         <div class="row">
             <form name="codeForm" class="form-inline text-center">
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon input-lg">#</div>
-                        <input autofocus autocomplete="off" name="code" required ng-model="queueId" type="text" class="form-control input-lg" placeholder="queue code">
+                        <input ng-disabled="!connected" autofocus autocomplete="off" name="code" required ng-model="queueId" type="text" class="form-control input-lg" placeholder="queue code">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="connect()" ng-disabled="codeForm.code.$error.required">start</button>
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="connect()" ng-disabled="codeForm.code.$error.required || !connected">start</button>
             </form>
         </div>
         <div class="row">
+            <h3 class="text-center" ng-hide="connected">no connection with server</h3>
             <h3 class="text-center error-message">{{errorMessage}}</h3>
         </div>
     </div>
-    <div class="container top-spacing" ng-show="connected">
+    <div class="container top-spacing" ng-show="!homeScreen">
         <div class="row" ng-hide="messageIsActive == true">
             <form name="clientForm" class="form-inline text-center">
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon input-lg"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> </div>
-                        <input name="name" required ng-model="name" type="text" class="form-control input-lg" placeholder="enter your name">
+                        <input ng-disabled="!registered" name="name" required ng-model="name" type="text" class="form-control input-lg" placeholder="enter your name">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="newClient()" ng-disabled="clientForm.name.$error.required">ok</button>
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="newClient()" ng-disabled="clientForm.name.$error.required || !registered">ok</button>
             </form>
         </div>
         <div class="row">
+            <h3 class="text-center" ng-hide="registered || !connected">registering...</h3>
+            <h3 class="text-center" ng-hide="connected">no connection with server</h3>
             <h3 class="text-center user-message">{{userMessage}}</h3>
         </div>
 

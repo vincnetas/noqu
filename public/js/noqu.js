@@ -1,5 +1,5 @@
 Storage.prototype.setObject = function (key, value) {
-    this.setItem(key, JSON.stringify(value));
+    this.setItem(key, angular.toJson(value));
 }
 
 Storage.prototype.getObject = function (key) {
@@ -27,17 +27,21 @@ angular.module('noquApp', [])
     .controller('QuController', ['$scope', 'QuService', function ($scope, QuService) {
         var socket = QuService.getSocket();
 
+        $scope.connected = false;
+        $scope.registered = false;
         $scope.clients = localStorage.getObject("clients") || [];
-
         $scope.queueId = localStorage.getItem("queueId");
-        if ($scope.queueId != null) {
+
+
+        function connectToQueue(queueId) {
             socket.emit("connectQueue", {
-                queueId: $scope.queueId
+                queueId: queueId
             }, function (response) {
                 if (response.connected) {
-                    // do nothing
+                    $scope.registered = true;
+                    $scope.$apply();
                 } else {
-                    alert(response.errorMessage);
+                    setTimeout(connectToQueue, 1000);
                 }
             });
         }
@@ -46,37 +50,15 @@ angular.module('noquApp', [])
             $scope.queueId = Math.round(Math.random() * 1000);
             localStorage.setItem("queueId", $scope.queueId);
 
-            socket.emit("connectQueue", {
-                queueId: $scope.queueId
-            }, function (response) {
-                if (response.connected) {
-                    // do nothing
-                } else {
-                    alert(response.errorMessage);
-                }
-            });
+            connectToQueue($scope.queueId);
         }
 
         $scope.disconnect = function () {
             $scope.queueId = null;
             localStorage.removeItem("queueId");
             localStorage.removeItem("clients");
+            socket.emit('closeQueue', {});
         }
-
-        socket.on("newClient", function (data) {
-            $scope.clients.push(data);
-            localStorage.setObject("clients", $scope.clients);
-            $scope.$apply();
-
-            socket.emit("queueState", {
-                clients: $scope.clients
-            });
-        });
-
-
-        socket.on('disconnect', function () {
-            alert("disconnected");
-        });
 
         $scope.deleteClient = function (client) {
             $scope.clients.splice($scope.clients.indexOf(client), 1);
@@ -87,14 +69,70 @@ angular.module('noquApp', [])
             });
         }
 
+        socket.on("newClient", function (data) {
+            $scope.clients.push(data);
+            localStorage.setObject("clients", $scope.clients);
+
+            socket.emit("queueState", {
+                clients: $scope.clients
+            });
+            $scope.$apply();
+        });
+
+        socket.on('connect', function () {
+            $scope.connected = true;
+            if ($scope.queueId != null) {
+                connectToQueue($scope.queueId);
+            }
+            $scope.$apply();
+        });
+
+        socket.on('disconnect', function () {
+            $scope.connected = false;
+            $scope.$apply();
+        });
+
     }]).controller('QuClController', ['$scope', 'QuService', function ($scope, QuService) {
         var socket = QuService.getSocket();
 
+        $scope.queueId = localStorage.getItem("clientQueueId");
+        $scope.homeScreen = $scope.queueId == null;
         $scope.connected = false;
+        $scope.registered = false;
 
-        socket.on("disconnect", function (data) {
-            $scope.errorMessage = data.errorMessage;
+        var reconnect = function (queueId) {
+            socket.emit("connectClient", {
+                queueId: $scope.queueId
+            }, function (response) {
+                if (response.connected) {
+                    $scope.registered = true;
+                } else {
+                    setTimeout(reconnect, 1000);
+                }
+                $scope.$apply();
+            });
+        }
+
+        socket.on("connect", function () {
+            $scope.connected = true;
+
+            if (!$scope.homeScreen) {
+                reconnect();
+            }
+
             $scope.$apply();
+        });
+
+        socket.on("disconnect", function () {
+            $scope.connected = false;
+            $scope.registered = false;
+
+            $scope.$apply();
+        });
+
+        socket.on('closeQueue', function () {
+            $scope.registered = false;
+            reconnect();
         });
 
         $scope.connect = function () {
@@ -102,8 +140,8 @@ angular.module('noquApp', [])
                 queueId: $scope.queueId
             }, function (response) {
                 if (response.connected) {
-                    $scope.connected = true;
-                    $scope.$apply();
+                    $scope.registered = true;
+                    $scope.homeScreen = false;
                 } else {
                     $scope.errorMessage = response.errorMessage;
                     $(".error-message").css("opacity", "1");
@@ -113,8 +151,8 @@ angular.module('noquApp', [])
                         duration: 2000,
                         queue: false
                     });
-                    $scope.$apply();
                 }
+                $scope.$apply();
             });
         }
 
@@ -123,7 +161,7 @@ angular.module('noquApp', [])
                 name: $scope.name,
                 id: new Date().getTime()
             }, function (response) {
-                if (response.connected) {
+                if (response.ok) {
                     $scope.userMessage = "you're in the line now. take a seat and wait to be called."
                     $scope.name = "";
                     $scope.messageIsActive = true;
@@ -138,31 +176,75 @@ angular.module('noquApp', [])
                             $scope.$apply();
                         }
                     });
-                    $scope.$apply();
-                } else {
-                    $scope.errorMessage = response.errorMessage;
-                    $scope.$apply();
                 }
+                $scope.$apply();
             });
         }
     }]).controller('QuDiController', ['$scope', 'QuService', function ($scope, QuService) {
         var socket = QuService.getSocket();
+
+        $scope.queueId = localStorage.getItem("clientQueueId");
+        $scope.homeScreen = $scope.queueId == null;
+        $scope.connected = false;
+        $scope.registered = false;
+
+        var reconnect = function (queueId) {
+            socket.emit("connectDisplay", {
+                queueId: $scope.queueId
+            }, function (response) {
+                if (response.connected) {
+                    $scope.registered = true;
+                } else {
+                    setTimeout(reconnect, 1000);
+                }
+                $scope.$apply();
+            });
+        }
 
         $scope.connect = function () {
             socket.emit("connectDisplay", {
                 queueId: $scope.queueId
             }, function (response) {
                 if (response.connected) {
-                    // something
+                    $scope.registered = true;
+                    $scope.homeScreen = false;
                 } else {
                     $scope.errorMessage = response.errorMessage;
-                    $scope.$apply();
+                    $(".error-message").css("opacity", "1");
+                    $(".error-message").animate({
+                        opacity: 0
+                    }, {
+                        duration: 2000,
+                        queue: false
+                    });
+
+                    $scope.errorMessage = response.errorMessage;
                 }
+                $scope.$apply();
             });
         }
+
+        socket.on('connect', function () {
+            $scope.connected = true;
+            if (!$scope.homeScreen) {
+                reconnect();
+            }
+            $scope.$apply();
+        });
 
         socket.on("queueState", function (data) {
             $scope.clients = data.clients;
             $scope.$apply();
+        });
+
+        socket.on('disconnect', function () {
+            $scope.connected = false;
+            $scope.registered = false;
+            $scope.$apply();
+        });
+    
+        socket.on('closeQueue', function () {
+            $scope.registered = false;
+            reconnect();
         });
     }]);
