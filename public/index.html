@@ -5,6 +5,7 @@
     <meta charset="utf-8">
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="css/style.css">
     <script type="text/javascript" src="bower_components/angular/angular.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
     <script src="/js/noqu.js"></script>
@@ -12,25 +13,30 @@
 
 <body ng-controller="QuController as qu">
 
-    <div class="container">
+    <div class="container top-spacing" ng-hide="queueId != null">
         <div class="row">
-            <span ng-show="queueId != null">Your queue code is {{queueId}}</span>
-            <button ng-hide="queueId != null" type="button" class="btn btn-default" aria-label="Left Align" ng-click="connect()">
-                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Open queue
-            </button>
-            <button ng-show="queueId != null" type="button" class="btn btn-default" aria-label="Left Align" ng-click="disconnect()">
-                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Close queue
-            </button>
-
-            <ul ng-repeat="client in clients">
-                <li>{{client.name}}<span ng-click="deleteClient(client)">X</span></li>
-            </ul>
-
+            <form class="text-center">
+                <button type="button" class="btn btn-primary btn-lg" aria-label="Left Align" ng-click="connect()">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> open new queue
+                </button>
+            </form>
         </div>
     </div>
 
+    <div class="container" ng-show="queueId != null">
+        <div class="row">
+            <h2>queue code is {{queueId}}</h2>
 
+            <button type="button" class="btn btn-warning btn-lg" aria-label="Left Align" ng-click="disconnect()">
+                <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> close queue
+            </button>
 
+            <ul ng-repeat="client in clients">
+                <li>{{client.name}}<span ng-click="deleteClient(client)">X</span>
+                </li>
+            </ul>
+        </div>
+    </div>
 
 </body>
 

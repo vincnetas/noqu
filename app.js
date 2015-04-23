@@ -88,7 +88,7 @@ io.on('connection', function (socket) {
             }
             queues[data.queueId] = queue;
         } else {
-            response.errorMessage = "Queue with code " + data.queueId + " already connected";
+            response.errorMessage = "queue with code " + data.queueId + " already connected";
         }
 
         callback(response);
@@ -103,7 +103,7 @@ io.on('connection', function (socket) {
         if (response.connected) {
             queue.displays[socket.id] = socket;
         } else {
-            response.errorMessage = "No queue with code " + data.queueId;
+            response.errorMessage = "no queue with code " + data.queueId;
         }
 
         callback(response);
@@ -118,7 +118,7 @@ io.on('connection', function (socket) {
         if (response.connected) {
             queue.socket.emit('newClient', data);
         } else {
-            response.errorMessage = "No queue for this client";
+            response.errorMessage = "no queue for this client";
         }
 
         callback(response);

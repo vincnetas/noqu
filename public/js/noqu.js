@@ -2,11 +2,16 @@ angular.module('noquApp', [])
     .factory('QuService', ['$http', function ($http) {
         return {
             getSocket: function () {
-                //var socket = io.connect();
-                var socket = io.connect('http://app.noqu.me:8000', {
-                    'forceNew': true
-                });
-                return socket;
+                var result = null;
+                if (window.location.hostname == "app.noqu.me") {
+                    result = io.connect('http://app.noqu.me:8000', {
+                        'forceNew': true
+                    });
+                } else {
+                    result = io.connect();
+                }
+
+                return result;
             }
         }
     }])
@@ -43,6 +48,11 @@ angular.module('noquApp', [])
             });
         }
 
+        $scope.disconnect = function () {
+            $scope.queueId = null;
+            localStorage.removeItem("queueId");
+        }
+
         socket.on("newClient", function (data) {
             $scope.clients.push(data);
             $scope.$apply();
@@ -50,6 +60,11 @@ angular.module('noquApp', [])
             socket.emit("queueState", {
                 clients: $scope.clients
             });
+        });
+
+
+        socket.on('disconnect', function () {
+            alert("disconnected");
         });
 
         $scope.deleteClient = function (client) {
@@ -62,6 +77,8 @@ angular.module('noquApp', [])
     }]).controller('QuClController', ['$scope', 'QuService', function ($scope, QuService) {
         var socket = QuService.getSocket();
 
+        $scope.connected = false;
+
         socket.on("disconnect", function (data) {
             $scope.errorMessage = data.errorMessage;
             $scope.$apply();
@@ -72,9 +89,17 @@ angular.module('noquApp', [])
                 queueId: $scope.queueId
             }, function (response) {
                 if (response.connected) {
-                    // something
+                    $scope.connected = true;
+                    $scope.$apply();
                 } else {
                     $scope.errorMessage = response.errorMessage;
+                    $(".error-message").css("opacity", "1");
+                    $(".error-message").animate({
+                        opacity: 0
+                    }, {
+                        duration: 2000,
+                        queue: false
+                    });
                     $scope.$apply();
                 }
             });
@@ -86,7 +111,21 @@ angular.module('noquApp', [])
                 id: new Date().getTime()
             }, function (response) {
                 if (response.connected) {
-                    // something
+                    $scope.userMessage = "you're in the line now. take a seat and wait to be called."
+                    $scope.name = "";
+                    $scope.messageIsActive = true;
+                    $(".user-message").css("opacity", "1");
+                    $(".user-message").animate({
+                        opacity: 0
+                    }, {
+                        duration: 5000,
+                        queue: false,
+                        always: function () {
+                            $scope.messageIsActive = false;
+                            $scope.$apply();
+                        }
+                    });
+                    $scope.$apply();
                 } else {
                     $scope.errorMessage = response.errorMessage;
                     $scope.$apply();
