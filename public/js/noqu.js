@@ -1,3 +1,12 @@
+Storage.prototype.setObject = function (key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+Storage.prototype.getObject = function (key) {
+    var value = this.getItem(key);
+    return value && JSON.parse(value);
+}
+
 angular.module('noquApp', [])
     .factory('QuService', ['$http', function ($http) {
         return {
@@ -18,7 +27,7 @@ angular.module('noquApp', [])
     .controller('QuController', ['$scope', 'QuService', function ($scope, QuService) {
         var socket = QuService.getSocket();
 
-        $scope.clients = [];
+        $scope.clients = localStorage.getObject("clients") || [];
 
         $scope.queueId = localStorage.getItem("queueId");
         if ($scope.queueId != null) {
@@ -51,10 +60,12 @@ angular.module('noquApp', [])
         $scope.disconnect = function () {
             $scope.queueId = null;
             localStorage.removeItem("queueId");
+            localStorage.removeItem("clients");
         }
 
         socket.on("newClient", function (data) {
             $scope.clients.push(data);
+            localStorage.setObject("clients", $scope.clients);
             $scope.$apply();
 
             socket.emit("queueState", {
@@ -69,6 +80,8 @@ angular.module('noquApp', [])
 
         $scope.deleteClient = function (client) {
             $scope.clients.splice($scope.clients.indexOf(client), 1);
+            localStorage.setObject("clients", $scope.clients);
+
             socket.emit("queueState", {
                 clients: $scope.clients
             });
