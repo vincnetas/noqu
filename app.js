@@ -82,6 +82,7 @@ io.on('connection', function (socket) {
             socket.onDisconnect = function () {
                 delete queue.displays[socket.id];
             }
+            queue.socket.emit('newDisplay', {});
         } else {
             response.errorMessage = "no queue with code " + data.queueId;
         }

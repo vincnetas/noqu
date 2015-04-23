@@ -92,6 +92,12 @@ angular.module('noquApp', [])
             $scope.$apply();
         });
 
+        socket.on('newDisplay', function () {
+            socket.emit("queueState", {
+                clients: $scope.clients
+            });
+        });
+
     }]).controller('QuClController', ['$scope', 'QuService', function ($scope, QuService) {
         var socket = QuService.getSocket();
 
@@ -242,7 +248,7 @@ angular.module('noquApp', [])
             $scope.registered = false;
             $scope.$apply();
         });
-    
+
         socket.on('closeQueue', function () {
             $scope.registered = false;
             reconnect();
