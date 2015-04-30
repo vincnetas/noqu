@@ -8,19 +8,47 @@
     <link rel="stylesheet" href="css/style.css">
     <script type="text/javascript" src="bower_components/angular/angular.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
-    <script src="/js/noqu.js"></script>
+    <script src="js/noqu.js"></script>
+    <script src="js/queueCtrl.js"></script>
 </head>
 
 <body ng-controller="QuController as qu">
 
     <div class="container top-spacing" ng-hide="registered">
         <div class="row">
-            <form class="text-center">
-                <button ng-disabled="!connected" type="button" class="btn btn-primary btn-lg" aria-label="Left Align" ng-click="connect()">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> open new queue
-                </button>
-            </form>
-            <h3 class="text-center" ng-hide="connected">no connection with server</h3>
+            <div class="col-lg-12">
+                <form class="text-center">
+                    <button ng-disabled="!connected || topics.length < 1" type="button" class="btn btn-primary btn-lg" aria-label="Left Align" ng-click="connect()">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> open new queue
+                    </button>
+                </form>
+                <h3 class="text-center" ng-hide="connected">no connection with server</h3>
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-lg-12">
+                <form name="topicForm" class="form-inline text-center">
+                    <div class="form-group">
+                        <input ng-disabled="!connected" autofocus autocomplete="off" name="topic" required ng-model="topic" type="text" class="form-control" placeholder="topic name">
+                    </div>
+                    <button type="submit" class="btn btn-primary" ng-click="addTopic()" ng-disabled="topicForm.topic.$error.required || !connected">add</button>
+                </form>
+            </div>
+        </div>
+        <div class="row" ng-show="topics.length == 0">
+            <div class="col-lg-12">
+                <h3>Add topics to open a queue</h3>
+            </div>
+        </div>
+        <div class="row" ng-show="topics.length > 0">
+            <div class="col-lg-12">
+                <h3>Topics</h3>
+                <ul ng-repeat="topic in topics track by topic.id">
+                    <li>{{topic.name}} <span ng-click="removeTopic(topic)">X</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -47,13 +75,17 @@
         <div class="row">
             <table class="table table-hover" ng-show="clients.length > 0">
                 <thead>
-                    <th>client name</th>
+                    <th>number</th>
+                    <th>topic</th>
                     <th width="50px">remove</th>
                 </thead>
-                <tbody ng-repeat="client in clients">
+                <tbody ng-repeat="client in clients track by client.id">
                     <tr>
                         <td>
                             <h4>{{client.name}}</h4>
+                        </td>
+                        <td>
+                            <h4>{{client.topic.name}}</h4>
                         </td>
                         <td>
                             <button type="button" class="btn btn-default" aria-label="Left Align" ng-click="deleteClient(client)" title="remove client">

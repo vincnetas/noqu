@@ -30,6 +30,7 @@ io.on('connection', function (socket) {
         };
 
         if (response.connected) {
+            response.data = queue.data;
             queue.clients[socket.id] = socket;
             socket.queue = queue;
             socket.onDisconnect = function () {
@@ -51,6 +52,7 @@ io.on('connection', function (socket) {
         if (response.connected) {
             queue = {
                 id: data.queueId,
+                data: data.data,
                 clients: {},
                 displays: {},
                 socket: socket,
@@ -77,6 +79,7 @@ io.on('connection', function (socket) {
         };
 
         if (response.connected) {
+            response.data = queue.data;
             queue.displays[socket.id] = socket;
             socket.queue = queue;
             socket.onDisconnect = function () {
