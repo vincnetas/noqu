@@ -1,7 +1,7 @@
 module.controller('displayController', ['$scope', 'QuService', function ($scope, QuService) {
     var socket = QuService.getSocket();
 
-    $scope.queueId = localStorage.getItem("clientQueueId");
+    $scope.queueId = null;//localStorage.getItem("clientQueueId");
     $scope.homeScreen = $scope.queueId == null;
     $scope.connected = false;
     $scope.registered = false;
@@ -10,8 +10,9 @@ module.controller('displayController', ['$scope', 'QuService', function ($scope,
         socket.emit("connectDisplay", {
             queueId: $scope.queueId
         }, function (response) {
-            if (response.connected) {
+            if (response) {
                 $scope.registered = true;
+                $scope.clients = response.clients;
             } else {
                 setTimeout(reconnect, 1000);
             }
@@ -23,9 +24,10 @@ module.controller('displayController', ['$scope', 'QuService', function ($scope,
         socket.emit("connectDisplay", {
             queueId: $scope.queueId
         }, function (response) {
-            if (response.connected) {
+            if (response) {
                 $scope.registered = true;
                 $scope.homeScreen = false;
+                $scope.clients = response.clients;
             } else {
                 $scope.errorMessage = response.errorMessage;
                 $(".error-message").css("opacity", "1");
@@ -50,7 +52,7 @@ module.controller('displayController', ['$scope', 'QuService', function ($scope,
         $scope.$apply();
     });
 
-    socket.on("queueState", function (data) {
+    socket.on("queueUpdate", function (data) {
         $scope.clients = data.clients;
         $scope.$apply();
     });

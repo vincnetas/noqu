@@ -7,7 +7,7 @@ module.controller('registerController', ['$scope', 'QuService', function ($scope
 
     $scope.queueId = localStorage.getItem("queueId");
 
-    function connectQueue(queueId) {
+    function connectQueue(queueId, retry) {
         socket.emit("connectQueue", {
             queueId: queueId
         }, function (response) {
@@ -19,11 +19,17 @@ module.controller('registerController', ['$scope', 'QuService', function ($scope
 
                 $scope.$apply();
             } else {
-                setTimeout(function () {
-                    connectToQueue(queueId);
-                }, 1000);
+                if (retry) {
+                    setTimeout(function () {
+                        connectToQueue(queueId, retry);
+                    }, 1000);
+                }
             }
         });
+    }
+    
+    $scope.connectQueue = function() {
+        connectQueue($scope.queueId, false);
     }
 
     $scope.createQueue = function () {
@@ -33,7 +39,7 @@ module.controller('registerController', ['$scope', 'QuService', function ($scope
             if (response) {
                 $scope.queueId = response.queueId;
                 localStorage.setItem("queueId", $scope.queueId);
-                connectQueue($scope.queueId);
+                connectQueue($scope.queueId, true);
             } else {
 
             }
@@ -126,7 +132,7 @@ module.controller('registerController', ['$scope', 'QuService', function ($scope
     socket.on('connect', function () {
         $scope.connected = true;
         if ($scope.queueId != null) {
-            connectQueue($scope.queueId);
+            connectQueue($scope.queueId, true);
         }
         $scope.$apply();
     });

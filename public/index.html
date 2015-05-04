@@ -27,12 +27,9 @@
                 <h1>join existing queue</h1>
                 <form name="codeForm" class="form-inline">
                     <div class="form-group">
-                        <div class="input-group">
-                            <div class="input-group-addon input-lg">#</div>
-                            <input ng-disabled="!connected" autofocus autocomplete="off" name="code" required ng-model="queueId" type="text" class="form-control input-lg" placeholder="queue code">
-                        </div>
+                        <input ng-disabled="!connected" autofocus autocomplete="off" name="code" required ng-model="queueId" type="text" class="form-control input-lg" placeholder="queue token">
+                        <button type="submit" class="btn btn-primary btn-lg" ng-click="connectQueue()" ng-disabled="codeForm.code.$error.required || !connected">join</button>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg" ng-click="connectClient()" ng-disabled="codeForm.code.$error.required || !connected">join</button>
                 </form>
             </div>
             <div class="col-lg-6">
@@ -55,28 +52,27 @@
 
     <div class="container top-spacing-small" ng-show="registered">
         <div class="row">
-            <nav class="navbar navbar-default">
-                <div class="container-fluid">
-
-                    <div class="navbar-header">
-                        <span class="navbar-brand token-message" ng-show="token != null">queue token is {{token}}</span>
-                    </div>
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
-                        <form class="navbar-form navbar-right">
-                            <button type="button" class="btn btn-default" ng-click="getToken()">
+            <div class="col-lg-12 panel panel-default">
+                <div class="panel-body">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label class="token-message" ng-show="token != null">queue token is {{token}}</label>
+                            <button type="button" class="btn btn-default form-control" ng-click="getToken()">
                                 <span class="glyphicon glyphicon-check" aria-hidden="true"></span> get token
                             </button>
-                            <button type="button" class="btn btn-warning" ng-click="closeQueue()">
-                                <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> close queue
-                            </button>
-                        </form>
-                    </div>
+                        </div>
+                        <button type="button" class="btn btn-warning" ng-click="closeQueue()">
+                            <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> close queue
+                        </button>
+
+                    </form>
                 </div>
-            </nav>
+            </div>
 
             <h3 class="text-center" ng-hide="registered || !connected">registering...</h3>
             <h3 class="text-center" ng-hide="connected">no connection with server</h3>
         </div>
+
         <div class="row">
             <table class="table table-hover" ng-show="clients.length > 0">
                 <thead>
@@ -87,10 +83,10 @@
                 <tbody ng-repeat="client in clients track by client.id">
                     <tr>
                         <td>
-                            <h4>{{client.name}}</h4>
+                            {{client.name}}
                         </td>
                         <td>
-                            <h4>{{client.topic.name}}</h4>
+                            {{client.topic.name}}
                         </td>
                         <td>
                             <button type="button" class="btn btn-default" aria-label="Left Align" ng-click="deleteClient(client)" title="remove client">

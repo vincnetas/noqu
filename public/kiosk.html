@@ -11,7 +11,7 @@
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script>
     <script type="text/javascript" src="bower_components/lodash/lodash.js"></script>
-    
+
     <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
 
     <script src="js/noqu.js"></script>
@@ -24,12 +24,9 @@
         <div class="row">
             <form name="codeForm" class="form-inline text-center">
                 <div class="form-group">
-                    <div class="input-group">
-                        <div class="input-group-addon input-lg">#</div>
-                        <input ng-disabled="!connected" autofocus autocomplete="off" name="code" required ng-model="queueId" type="text" class="form-control input-lg" placeholder="queue code">
-                    </div>
+                    <input ng-disabled="!connected" autofocus autocomplete="off" name="code" required ng-model="queueId" type="text" class="form-control input-lg" placeholder="queue token">
+                    <button type="submit" class="btn btn-primary btn-lg" ng-click="connectClient()" ng-disabled="codeForm.code.$error.required || !connected">open</button>
                 </div>
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="connectClient()" ng-disabled="codeForm.code.$error.required || !connected">start</button>
             </form>
         </div>
         <div class="row">
@@ -38,7 +35,7 @@
         </div>
     </div>
 
-    <div class="container top-spacing" ng-show="!homeScreen">
+    <div class="container top-spacing-small" ng-show="!homeScreen">
         <div class="row" ng-hide="messageIsActive == true">
             <div class="col-lg-4"></div>
             <div class="col-lg-4">
@@ -48,7 +45,6 @@
                 <form name="clientForm" class="form-inline" ng-repeat="topic in topics track by topic.id">
                     <hr/>
                     <button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="newClient(topic)" ng-disabled="clientForm.name.$error.required || !registered">{{topic.name}}</button>
-
                 </form>
             </div>
         </div>
@@ -57,12 +53,7 @@
             <span class="huge">{{userMessage}}</span>
             <h3>take a seat please</h3>
         </div>
-
     </div>
-
-
-
-
 </body>
 
 </html>

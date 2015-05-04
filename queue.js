@@ -102,28 +102,31 @@ module.exports = function (socket) {
     });
 
     socket.on('connectDisplay', function (data, callback) {
-        var queue = queues[data.queueId];
-        var response = {
-            connected: queue != null
-        };
+        getQueue(data.queueId, function (err, queue) {
+            if (err) {
+                callback(false);
+            } else {
+                socket.queue = queue;
+                queue.displays[socket.id] = socket;
+                socket.onDisconnect = function () {
+                    delete queue.displays[socket.id];
+                }
 
-        if (response.connected) {
-            response.data = queue.data;
-            queue.displays[socket.id] = socket;
-            socket.queue = queue;
-            socket.onDisconnect = function () {
-                delete queue.displays[socket.id];
+                callback({
+                    clients: queue.clients,
+                    queueId: queue.id
+                });
             }
-            queue.socket.emit('newDisplay', {});
-        } else {
-            response.errorMessage = "no queue with code " + data.queueId;
-        }
-
-        callback(response);
+        });
     });
 
     function notifyQueueUpdate(queue) {
         forEach(queue.registers, function (socket) {
+            socket.emit('queueUpdate', {
+                clients: queue.clients
+            });
+        });
+        forEach(queue.displays, function (socket) {
             socket.emit('queueUpdate', {
                 clients: queue.clients
             });

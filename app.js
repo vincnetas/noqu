@@ -1,5 +1,3 @@
-
-
 var path = require('path');
 var mongoose = require('mongoose');
 var config = require('./config/config');
