@@ -1,4 +1,4 @@
-module.controller('QuDiController', ['$scope', 'QuService', function ($scope, QuService) {
+module.controller('displayController', ['$scope', 'QuService', function ($scope, QuService) {
     var socket = QuService.getSocket();
 
     $scope.queueId = localStorage.getItem("clientQueueId");

@@ -7,7 +7,34 @@ Storage.prototype.getObject = function (key) {
     return value && JSON.parse(value);
 }
 
-var module = angular.module('noquApp', []);
+var module = angular.module('noquApp', ['ui.utils']);
+
+module.directive('focusOnShow', function ($timeout) {
+    return {
+        restrict: 'A',
+        link: function ($scope, $element, $attr) {
+            if ($attr.ngShow) {
+                $scope.$watch($attr.ngShow, function (newValue) {
+                    if (newValue) {
+                        $timeout(function () {
+                            $($element).focus();
+                        }, 0);
+                    }
+                })
+            }
+            if ($attr.ngHide) {
+                $scope.$watch($attr.ngHide, function (newValue) {
+                    if (!newValue) {
+                        $timeout(function () {
+                            $($element).focus();
+                        }, 0);
+                    }
+                })
+            }
+
+        }
+    };
+});
 
 module.factory('QuService', ['$http', function ($http) {
     return {

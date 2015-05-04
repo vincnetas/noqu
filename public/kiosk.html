@@ -9,12 +9,13 @@
     <script type="text/javascript" src="bower_components/angular/angular.js"></script>
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+   
     <script src="js/noqu.js"></script>
-    <script src="js/clientCtrl.js"></script>
+    <script src="js/kioskCtrl.js"></script>
 
 </head>
 
-<body ng-controller="QuClController as qu">
+<body ng-controller="kioskController as qu">
     <div class="container top-spacing" ng-show="homeScreen">
         <div class="row">
             <form name="codeForm" class="form-inline text-center">
@@ -24,7 +25,7 @@
                         <input ng-disabled="!connected" autofocus autocomplete="off" name="code" required ng-model="queueId" type="text" class="form-control input-lg" placeholder="queue code">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="connect()" ng-disabled="codeForm.code.$error.required || !connected">start</button>
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="connectClient()" ng-disabled="codeForm.code.$error.required || !connected">start</button>
             </form>
         </div>
         <div class="row">
@@ -40,7 +41,7 @@
                 <h3 ng-show="registered && connected">select topic</h3>
                 <h3 ng-hide="registered || !connected">registering...</h3>
                 <h3 ng-hide="connected">no connection with server</h3>
-                <form name="clientForm" class="form-inline" ng-repeat="topic in data.topics track by topic.id">
+                <form name="clientForm" class="form-inline" ng-repeat="topic in topics track by topic.id">
                     <hr/>
                     <button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="newClient(topic)" ng-disabled="clientForm.name.$error.required || !registered">{{topic.name}}</button>
 

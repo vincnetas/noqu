@@ -1,4 +1,4 @@
-module.controller('QuClController', ['$scope', 'QuService', function ($scope, QuService) {
+module.controller('kioskController', ['$scope', 'QuService', function ($scope, QuService) {
     var socket = QuService.getSocket();
 
     $scope.queueId = localStorage.getItem("clientQueueId");
@@ -10,8 +10,8 @@ module.controller('QuClController', ['$scope', 'QuService', function ($scope, Qu
         socket.emit("connectClient", {
             queueId: $scope.queueId
         }, function (response) {
-            if (response.connected) {
-                $scope.data = response.data;
+            if (response) {
+                $scope.topics = response.topics;
                 $scope.registered = true;
             } else {
                 setTimeout(reconnect, 1000);
@@ -37,28 +37,25 @@ module.controller('QuClController', ['$scope', 'QuService', function ($scope, Qu
         $scope.$apply();
     });
 
-    socket.on('closeQueue', function () {
-        $scope.registered = false;
-        reconnect();
-    });
-
-    $scope.connect = function () {
+    $scope.connectClient = function () {
         socket.emit("connectClient", {
             queueId: $scope.queueId
         }, function (response) {
-            if (response.connected) {
-                $scope.data = response.data;
+            if (response) {
+                $scope.topics = response.topics;
+                $scope.queueId = response.queueId;
                 $scope.registered = true;
                 $scope.homeScreen = false;
             } else {
-                $scope.errorMessage = response.errorMessage;
-                $(".error-message").css("opacity", "1");
-                $(".error-message").animate({
-                    opacity: 0
-                }, {
-                    duration: 2000,
-                    queue: false
-                });
+                $scope.errorMessage = "can't connect";
+                $(".error-message")
+                    .css("opacity", "1")
+                    .animate({
+                        opacity: 0
+                    }, {
+                        duration: 2000,
+                        queue: false
+                    });
             }
             $scope.$apply();
         });
@@ -71,7 +68,7 @@ module.controller('QuClController', ['$scope', 'QuService', function ($scope, Qu
             topic: topic,
             id: new Date().getTime()
         }, function (response) {
-            if (response.ok) {
+            if (response) {
                 $scope.userMessage = number;
                 $scope.messageIsActive = true;
                 $(".user-message").css("opacity", "1");
@@ -85,6 +82,8 @@ module.controller('QuClController', ['$scope', 'QuService', function ($scope, Qu
                         $scope.$apply();
                     }
                 });
+            } else {
+                console.error("error");
             }
             $scope.$apply();
         });
