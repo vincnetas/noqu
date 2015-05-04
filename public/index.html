@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="css/style.css">
@@ -18,19 +19,12 @@
 
 <body ng-controller="registerController as qu">
 
-    <div class="container top-spacing" ng-hide="registered">
+    <div class="container top-spacing-small" ng-hide="registered">
         <h3 class="text-center" ng-hide="connected">no connection with server</h3>
 
         <div class="row">
             <div class="col-lg-6">
                 <h1>join existing queue</h1>
-            </div>
-            <div class="col-lg-6">
-                <h1>create new queue</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6">
                 <form name="codeForm" class="form-inline">
                     <div class="form-group">
                         <div class="input-group">
@@ -42,6 +36,7 @@
                 </form>
             </div>
             <div class="col-lg-6">
+                <h1>create new queue</h1>
 
                 <div ng-show="topics.length > 0" ng-repeat="topic in topics track by topic.id">
                     <input focus-on-show ui-keypress="{enter: 'applyTopicEdit(topic, true)', esc: 'cancelTopicEdit(topic)'}" class="topic-name form-control" ng-blur="applyTopicEdit(topic)" ng-show="topic.editing" autocomplete="off" required ng-model="topic.editingName" type="text" placeholder="topic name">
@@ -56,7 +51,6 @@
                 </form>
             </div>
         </div>
-
     </div>
 
     <div class="container top-spacing-small" ng-show="registered">
