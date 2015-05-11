@@ -62,14 +62,13 @@ module.controller('kioskController', ['$scope', 'QuService', function ($scope, Q
     }
 
     $scope.newClient = function (topic) {
-        var number = Math.round(Math.random() * 1000);
         socket.emit("newClient", {
-            name: number,
             topic: topic,
             id: new Date().getTime()
         }, function (response) {
             if (response) {
-                $scope.userMessage = number;
+                delete topic.inputValue;
+                $scope.userMessage = response.number;
                 $scope.messageIsActive = true;
                 $(".user-message").css("opacity", "1");
                 $(".user-message").animate({

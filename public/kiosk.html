@@ -39,12 +39,20 @@
         <div class="row" ng-hide="messageIsActive == true">
             <div class="col-lg-4"></div>
             <div class="col-lg-4">
-                <h3 ng-show="registered && connected">select topic</h3>
+                <h3 ng-show="registered && connected"></h3>
                 <h3 ng-hide="registered || !connected">registering...</h3>
                 <h3 ng-hide="connected">no connection with server</h3>
                 <form name="clientForm" class="form-inline" ng-repeat="topic in topics track by topic.id">
-                    <hr/>
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="newClient(topic)" ng-disabled="clientForm.name.$error.required || !registered">{{topic.name}}</button>
+                    <hr ng-hide="$first"/>
+                    <button ng-if="!topic.inputName" type="submit" class="btn btn-primary btn-lg btn-block" ng-click="newClient(topic)" ng-disabled="clientForm.name.$error.required || !registered">{{topic.name}}</button>
+
+                    <h3 ng-if="topic.inputName">{{topic.name}}</h3>
+                    <p ng-if="topic.inputName">
+                            <input autofocus autocomplete="off" name="inputValue" required ng-model="topic.inputValue" type="text" class="form-control input-lg" placeholder="{{topic.inputName}}">
+
+                            <button type="submit" class="btn btn-primary btn-lg pull-right" ng-click="newClient(topic)" ng-disabled="clientForm.inputValue.$error.required || !connected">ok</button>
+
+                    </p>
                 </form>
             </div>
         </div>

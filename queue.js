@@ -144,11 +144,36 @@ module.exports = function (socket) {
             }
         });
     }
+    
+    function getClientNumber(client, queue) {
+        var index = _.findIndex(queue.topics, 'id', client.topic.id);
+        if (index != -1) {
+            topic = queue.topics[index];
+            topic.counter++;
+            
+            if (topic.counter > 99) {
+                topic.counter = 0;
+            }
+            
+            return (index + 1) + _.padLeft("" + topic.counter, 2, '0');
+        }
+        
+        return -1;
+    }
 
     socket.on('newClient', function (client, callback) {
         var queue = socket.queue;
+        client.number = getClientNumber(client, queue);
         queue.clients.push(client);
-        updateQueue(queue, callback);
+        updateQueue(queue, function(result) {
+            if (result) {
+                callback({
+                    number: client.number
+                });
+            } else {
+                callback(result);
+            }
+        });
     });
 
     socket.on('deleteClient', function (client, callback) {

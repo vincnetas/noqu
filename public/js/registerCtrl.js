@@ -27,14 +27,31 @@ module.controller('registerController', ['$scope', 'QuService', function ($scope
             }
         });
     }
-    
-    $scope.connectQueue = function() {
+
+    $scope.connectQueue = function () {
         connectQueue($scope.queueId, false);
+    }
+
+    function parseTopics(topics) {
+        var result = []
+        for (var i = 0; i < topics.length; i++) {
+            var topic = topics[i];
+            var regexp = /([^[]+)(\[(.+)\])?/g;
+            var res = regexp.exec(topic.name);
+            result.push({
+                id: topic.id,
+                name: res[1],
+                inputName: res[3],
+                counter: 0
+            });
+        }
+
+        return result;
     }
 
     $scope.createQueue = function () {
         socket.emit("createQueue", {
-            topics: $scope.topics
+            topics: parseTopics($scope.topics)
         }, function (response) {
             if (response) {
                 $scope.queueId = response.queueId;
@@ -81,7 +98,7 @@ module.controller('registerController', ['$scope', 'QuService', function ($scope
                 $scope.addTopic();
             }
         } else {
-            $scope.removeTopic(topic);  
+            $scope.removeTopic(topic);
         }
         topic.editing = false;
     }

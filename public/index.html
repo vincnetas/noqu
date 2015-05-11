@@ -34,10 +34,13 @@
             </div>
             <div class="col-lg-6">
                 <h1>create new queue</h1>
-
-                <div ng-show="topics.length > 0" ng-repeat="topic in topics track by topic.id">
-                    <input focus-on-show ui-keypress="{enter: 'applyTopicEdit(topic, true)', esc: 'cancelTopicEdit(topic)'}" class="topic-name form-control" ng-blur="applyTopicEdit(topic)" ng-show="topic.editing" autocomplete="off" required ng-model="topic.editingName" type="text" placeholder="topic name">
-                    <h4 ng-click="topic.editing = true" ng-hide="topic.editing">{{topic.name}} <span title="remove" class="label label-default" ng-click="removeTopic(topic)">x</span></h4>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div ng-show="topics.length > 0" ng-repeat="topic in topics track by topic.id">
+                            <input focus-on-show ui-keypress="{enter: 'applyTopicEdit(topic, true)', esc: 'cancelTopicEdit(topic)'}" class="topic-name form-control" ng-blur="applyTopicEdit(topic)" ng-show="topic.editing" autocomplete="off" required ng-model="topic.editingName" type="text" placeholder="topic name [field name]">
+                            <h4 ng-click="topic.editing = true" ng-hide="topic.editing">{{topic.name}} <span title="remove" class="label label-default" ng-click="removeTopic(topic)">x</span></h4>
+                        </div>
+                    </div>
                 </div>
                 <br ng-show="topics.length > 0" />
                 <form>
@@ -78,15 +81,19 @@
                 <thead>
                     <th>number</th>
                     <th>topic</th>
+                    <th>info</th>
                     <th width="50px">remove</th>
                 </thead>
                 <tbody ng-repeat="client in clients track by client.id">
                     <tr>
                         <td>
-                            {{client.name}}
+                            {{client.number}}
                         </td>
                         <td>
                             {{client.topic.name}}
+                        </td>
+                        <td>
+                            <span ng-show="client.topic.inputValue">{{client.topic.inputName}} : {{client.topic.inputValue}}</span>
                         </td>
                         <td>
                             <button type="button" class="btn btn-default" aria-label="Left Align" ng-click="deleteClient(client)" title="remove client">
